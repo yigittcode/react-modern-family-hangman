@@ -1,4 +1,4 @@
-import { characters } from "./chracters"
+import { characters } from "./characters"
 
 export function getRandomWord() {
     const randomIndex = Math.floor(Math.random() * characters.length)
