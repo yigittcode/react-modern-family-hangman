@@ -2,6 +2,8 @@
 
 A fun and engaging word-guessing game inspired by the hit TV show Modern Family! Test your knowledge of the show's beloved characters while being entertained by Phil Dunphy's most memorable quotes.
 
+Try the game here: https://react-modern-family-hangman.vercel.app/
+
 ## Features
 
 - Challenge yourself to guess Modern Family character names within 3 attempts
