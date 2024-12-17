@@ -1,24 +1,34 @@
 import { useState, useEffect } from "react"
 import { clsx } from "clsx"
-import { characters } from "./languages"
+import { characters } from "./chracters"
+import { phillQuotes } from "./phill-quotes"
 import { getFarewellText, getRandomWord } from "./utils"
 import Confetti from "react-confetti"
 
 export default function ModernFamilyGame() {
+  const [availableCharacters] = useState(() => {
+    // Randomly select 3 characters from the full list
+    const shuffled = [...characters].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  });
+
   // State values
   const [currentCharacter, setCurrentCharacter] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * characters.length)
-    return characters[randomIndex].name.toLowerCase()
-  })
+    const randomIndex = Math.floor(Math.random() * availableCharacters.length);
+    return availableCharacters[randomIndex].name.toLowerCase();
+  });
   const [guessedLetters, setGuessedLetters] = useState([])
   const [showHints, setShowHints] = useState(false)
   const [currentHintIndex, setCurrentHintIndex] = useState(0)
   const [currentCharacterIndex, setCurrentCharacterIndex] = useState(() => {
-    return Math.floor(Math.random() * characters.length)
+    return Math.floor(Math.random() * availableCharacters.length)
+  })
+  const [currentQuote, setCurrentQuote] = useState(() => {
+    return phillQuotes[Math.floor(Math.random() * phillQuotes.length)]
   })
 
   // Derived values
-  const numGuessesLeft = characters.length - 1
+  const numGuessesLeft = 3;
   const wrongGuessCount = guessedLetters.filter(letter => !currentCharacter.includes(letter)).length
   const isGameWon = currentCharacter.split("").every(letter => guessedLetters.includes(letter))
   const isGameLost = wrongGuessCount >= numGuessesLeft
@@ -35,7 +45,7 @@ export default function ModernFamilyGame() {
   }
 
   const handleNextHint = () => {
-    if (currentHintIndex < characters[currentCharacterIndex].hints.length - 1) {
+    if (currentHintIndex < availableCharacters[currentCharacterIndex].hints.length - 1) {
       setCurrentHintIndex(prev => prev + 1)
     }
   }
@@ -46,20 +56,21 @@ export default function ModernFamilyGame() {
   }
 
   const startNewGame = () => {
-    const newIndex = Math.floor(Math.random() * characters.length)
-    setCurrentCharacterIndex(newIndex)
-    setCurrentCharacter(characters[newIndex].name.toLowerCase())
-    setGuessedLetters([])
-    resetHints()
+    const newIndex = Math.floor(Math.random() * availableCharacters.length);
+    setCurrentCharacterIndex(newIndex);
+    setCurrentCharacter(availableCharacters[newIndex].name.toLowerCase());
+    setGuessedLetters([]);
+    resetHints();
+    setCurrentQuote(phillQuotes[Math.floor(Math.random() * phillQuotes.length)]);
   }
 
   useEffect(() => {
-    const newIndex = Math.floor(Math.random() * characters.length)
-    setCurrentCharacterIndex(newIndex)
-    setCurrentCharacter(characters[newIndex].name.toLowerCase())
-  }, [])
+    const newIndex = Math.floor(Math.random() * availableCharacters.length);
+    setCurrentCharacterIndex(newIndex);
+    setCurrentCharacter(availableCharacters[newIndex].name.toLowerCase());
+  }, [availableCharacters]);
 
-  const languageElements = characters.map((char, index) => {
+  const languageElements = availableCharacters.map((char, index) => {
     const isLanguageLost = index < wrongGuessCount
     const styles = {
       backgroundColor: char.backgroundColor,
@@ -122,7 +133,7 @@ export default function ModernFamilyGame() {
     if (!isGameOver && isLastGuessIncorrect) {
       return (
         <p className="farewell-message">
-          {getFarewellText(characters[wrongGuessCount - 1].name)}
+          {getFarewellText(availableCharacters[wrongGuessCount - 1].name)}
         </p>
       )
     }
@@ -131,7 +142,7 @@ export default function ModernFamilyGame() {
       return (
         <>
           <h2>You win!</h2>
-          <p>Well done! 🎉</p>
+          <p>Well done!, Family is together. 🎉</p>
         </>
       )
     }
@@ -140,7 +151,6 @@ export default function ModernFamilyGame() {
         <>
           <h2>Game over!</h2>
           <p>You lose! Time for a family meeting 😭</p>
-          <p>The character was: {currentCharacter.toUpperCase()}</p>
         </>
       )
     }
@@ -154,7 +164,11 @@ export default function ModernFamilyGame() {
       
       <header>
         <h1>Modern Family Character Game</h1>
-        <p>Guess which Modern Family character this is within {characters.length - 1} attempts!</p>
+        <p>Guess which Modern Family character this is within 3 attempts!</p>
+        <blockquote className="phil-quote">
+          "{currentQuote}"
+          <footer>- Phil Dunphy</footer>
+        </blockquote>
       </header>
 
       <section
@@ -185,14 +199,14 @@ export default function ModernFamilyGame() {
         {showHints && (
           <div className="hints-container">
             <p className="character-hint">
-              Hint #{currentHintIndex + 1}: {characters[currentCharacterIndex].hints[currentHintIndex]}
+              Hint #{currentHintIndex + 1}: {availableCharacters[currentCharacterIndex].hints[currentHintIndex]}
             </p>
             <button 
               className="next-hint-button"
               onClick={handleNextHint}
-              disabled={currentHintIndex >= characters[currentCharacterIndex].hints.length - 1}
+              disabled={currentHintIndex >= availableCharacters[currentCharacterIndex].hints.length - 1}
             >
-              Next Hint ({currentHintIndex + 1}/{characters[currentCharacterIndex].hints.length})
+              Next Hint ({currentHintIndex + 1}/{availableCharacters[currentCharacterIndex].hints.length})
             </button>
           </div>
         )}
